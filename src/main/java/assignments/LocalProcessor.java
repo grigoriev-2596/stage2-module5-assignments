@@ -35,8 +35,8 @@ public class LocalProcessor {
     }
 
     @ListIteratorAnnotation
-    public void printProcessorNameParts() {
-        for(String s : processorNameParts) {
+    public void printList(List<String> listToIterate) {
+        for(String s : listToIterate) {
             System.out.println(s.hashCode());
         }
     }
