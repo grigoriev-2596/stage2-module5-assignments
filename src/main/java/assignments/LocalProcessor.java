@@ -19,13 +19,16 @@ public class LocalProcessor {
     private Long period = 10_000_000_000_000L;
     private StringBuilder processorVersion;
     private List<String> processorNameParts = new LinkedList<>();
+    private Scanner informationScanner;
     private static Logger logger = Logger.getLogger(LocalProcessor.class.getName());
 
-    public LocalProcessor(StringBuilder processorName, Long period, StringBuilder processorVersion, LinkedList<String> processorNameParts) {
-        this.processorName = Objects.requireNonNull(processorName, "processorName must not be null");
+    public LocalProcessor(String processorName, Long period, String processorVersion,
+                          Scanner informationScanner, LinkedList<String> processorNameParts) {
+        this.processorName = new StringBuilder(Objects.requireNonNull(processorName, "processorName must not be null"));
         this.period = Objects.requireNonNull(period, "period must not be null");
-        this. processorVersion = Objects.requireNonNull(processorVersion, "processorVersion must not be null");
-        this.processorNameParts = Objects.requireNonNull(processorNameParts, "stringArrayList must not be null");
+        this.processorVersion = new StringBuilder(Objects.requireNonNull(processorVersion, "processorVersion must not be null"));
+        this.processorNameParts = Objects.requireNonNull(processorNameParts, "processorNameParts must not be null");
+        this.informationScanner = Objects.requireNonNull(informationScanner, "informationScanner must not be null");
     }
 
     public LocalProcessor() {
@@ -48,12 +51,17 @@ public class LocalProcessor {
 
     @ReadFullProcessorNameAnnotation
     public void readFullProcessorVersion(File file) {
-        try (Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNext()) {
-                processorVersion.append(scanner.nextLine());
+        try {
+            informationScanner = new Scanner(file);
+            while (informationScanner.hasNext()) {
+                processorVersion.append(informationScanner.nextLine());
             }
         } catch (FileNotFoundException e) {
             logger.log(Level.SEVERE, "An exception was thrown", e);
+        } finally {
+            if (informationScanner != null) {
+                informationScanner.close();
+            }
         }
     }
 }
