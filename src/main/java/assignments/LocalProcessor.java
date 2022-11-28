@@ -2,8 +2,9 @@ package assignments;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import assignments.annotations.FullNameProcessorGeneratorAnnotation;
 import assignments.annotations.ListIteratorAnnotation;
@@ -14,48 +15,45 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LocalProcessor {
-    private String processorName;
-    private Long period = 10000000000000L;
-    protected String ProcessorVersion;
-    private Integer valueofCheap;
-    Scanner informationscanner;
-    static LinkedList<String> stringArrayList = new LinkedList<>();
+    private StringBuilder processorName;
+    private Long period = 10_000_000_000_000L;
+    private StringBuilder processorVersion;
+    private List<String> processorNameParts = new LinkedList<>();
+    private static Logger logger = Logger.getLogger(LocalProcessor.class.getName());
 
-    public LocalProcessor(String processorName, Long period, String processorVersion, Integer valueOfCheap,
-                          Scanner informationscanner, LinkedList<String> stringArrayList) {
-        this.processorName = processorName;
-        this.period = period;
-        ProcessorVersion = processorVersion;
-        this.valueofCheap = valueOfCheap;
-        this.informationscanner = informationscanner;
-        this.stringArrayList = stringArrayList;
+    public LocalProcessor(StringBuilder processorName, Long period, StringBuilder processorVersion, LinkedList<String> processorNameParts) {
+        this.processorName = Objects.requireNonNull(processorName, "processorName must not be null");
+        this.period = Objects.requireNonNull(period, "period must not be null");
+        this. processorVersion = Objects.requireNonNull(processorVersion, "processorVersion must not be null");
+        this.processorNameParts = Objects.requireNonNull(processorNameParts, "stringArrayList must not be null");
     }
 
     public LocalProcessor() {
     }
 
     @ListIteratorAnnotation
-    public void listiterator(LinkedList<String> stringList) {
-        stringArrayList = new LinkedList<>(stringList);
-        for (int i = 0; i < period; i++) {
-            System.out.println(stringArrayList.get(i).hashCode());
+    public void printProcessorNameParts() {
+        for(String s : processorNameParts) {
+            System.out.println(s.hashCode());
         }
     }
 
     @FullNameProcessorGeneratorAnnotation
-    public String fullnameProcessorgenerator(LinkedList<String> stringList) {
-        for (int i = 0; i < stringArrayList.size(); i++) {
-            processorName+=stringList.get(i)+' ';
+    public String fullNameProcessorGenerator() {
+        for(String s : processorNameParts) {
+            processorName.append(s).append(' ');
         }
-        return processorName;
+        return processorName.toString();
     }
 
     @ReadFullProcessorNameAnnotation
-    public void readfullprocessorname(File file) throws FileNotFoundException {
-            informationscanner = new Scanner(file);
-            while (informationscanner.hasNext()) {
-                ProcessorVersion+= informationscanner.nextLine();
+    public void readFullProcessorVersion(File file) {
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNext()) {
+                processorVersion.append(scanner.nextLine());
             }
-
+        } catch (FileNotFoundException e) {
+            logger.log(Level.SEVERE, "An exception was thrown", e);
+        }
     }
 }
